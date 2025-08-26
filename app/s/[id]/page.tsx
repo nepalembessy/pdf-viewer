@@ -1,20 +1,15 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
-import { Document, Page, pdfjs } from "react-pdf"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { Lock, FileText, Eye, EyeOff, Download, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react"
-
-// Set up PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
+import { Lock, FileText, Eye, EyeOff, Download } from "lucide-react"
 
 interface PDFInfo {
   id: string
@@ -41,11 +36,6 @@ export default function PDFViewerPage() {
   const [loading, setLoading] = useState(false)
   const [pdfAccess, setPdfAccess] = useState<PDFAccess | null>(null)
   const [initialLoading, setInitialLoading] = useState(true)
-
-  const [numPages, setNumPages] = useState<number>(0)
-  const [pageNumber, setPageNumber] = useState<number>(1)
-  const [scale, setScale] = useState<number>(1.0)
-  const [pdfLoading, setPdfLoading] = useState<boolean>(true)
 
   useEffect(() => {
     fetchPDFInfo()
@@ -89,7 +79,6 @@ export default function PDFViewerPage() {
           ...data,
           pdfUrl: data.pdfUrl, // Use the actual blob URL directly
         })
-        setPdfLoading(true)
       } else {
         setError(data.error || "Access denied")
       }
@@ -109,25 +98,6 @@ export default function PDFViewerPage() {
       link.click()
       document.body.removeChild(link)
     }
-  }
-
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages)
-    setPdfLoading(false)
-  }
-
-  const onDocumentLoadError = (error: Error) => {
-    console.error("PDF load error:", error)
-    setError("Failed to load PDF document")
-    setPdfLoading(false)
-  }
-
-  const changePage = (offset: number) => {
-    setPageNumber((prevPageNumber) => Math.min(Math.max(prevPageNumber + offset, 1), numPages))
-  }
-
-  const changeScale = (newScale: number) => {
-    setScale(Math.min(Math.max(newScale, 0.5), 3.0))
   }
 
   if (initialLoading) {
@@ -191,58 +161,11 @@ export default function PDFViewerPage() {
           </div>
         </div>
 
+        {/* PDF Viewer */}
         <div className="container mx-auto px-4 py-8">
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden">
-            {/* PDF Controls */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => changePage(-1)} disabled={pageNumber <= 1}>
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <span className="text-sm">
-                  Page {pageNumber} of {numPages}
-                </span>
-                <Button variant="outline" size="sm" onClick={() => changePage(1)} disabled={pageNumber >= numPages}>
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => changeScale(scale - 0.2)} disabled={scale <= 0.5}>
-                  <ZoomOut className="w-4 h-4" />
-                </Button>
-                <span className="text-sm">{Math.round(scale * 100)}%</span>
-                <Button variant="outline" size="sm" onClick={() => changeScale(scale + 0.2)} disabled={scale >= 3.0}>
-                  <ZoomIn className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* PDF Viewer */}
-            <div className="flex justify-center p-4 bg-gray-100 dark:bg-slate-700 min-h-[80vh]">
-              {pdfLoading && (
-                <div className="flex items-center justify-center h-96">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              )}
-              <Document
-                file={pdfAccess.pdfUrl}
-                onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadError}
-                loading={
-                  <div className="flex items-center justify-center h-96">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div>
-                }
-                className="shadow-lg"
-              >
-                <Page
-                  pageNumber={pageNumber}
-                  scale={scale}
-                  renderTextLayer={false}
-                  renderAnnotationLayer={false}
-                  className="border border-gray-300 dark:border-gray-600"
-                />
-              </Document>
+            <div className="w-full h-[calc(100vh-200px)]">
+              <iframe src={pdfAccess.pdfUrl} className="w-full h-full border-0" title={pdfAccess.filename} />
             </div>
           </div>
         </div>
