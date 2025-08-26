@@ -14,14 +14,6 @@ export default function NotFound() {
           <CardTitle className="text-2xl">Page Not Found</CardTitle>
           <CardDescription>The page you're looking for doesn't exist or has been moved.</CardDescription>
         </CardHeader>
-        <CardContent className="text-center">
-          <Link href="/">
-            <Button className="w-full">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Go Home
-            </Button>
-          </Link>
-        </CardContent>
       </Card>
     </div>
   )

@@ -3,12 +3,29 @@ import type { Metadata } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { ClerkProvider } from "@clerk/nextjs"
+import { DynamicTitle } from "@/components/dynamic-title"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Secure PDF Sharing Platform",
-  description: "Professional document sharing with password protection and secure access controls",
-  generator: "v0.app",
+  title: "Nepal Embassy - India",
+  description: "Nepal Embassy - India",
+  generator: "np-in",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  other: {
+    "X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet, noimageindex",
+  },
 }
 
 function validateClerkEnvironment() {
@@ -37,7 +54,10 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>{children}</body>
+        <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+          <DynamicTitle />
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   )

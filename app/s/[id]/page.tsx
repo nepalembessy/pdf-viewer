@@ -51,7 +51,7 @@ export default function PDFViewerPage() {
       if (response.ok) {
         setPdfInfo(data)
       } else {
-        setError(data.error || "PDF not found")
+        setError(data.error || "Document not found")
       }
     } catch (error) {
       setError("Network error. Please try again.")
@@ -104,7 +104,7 @@ export default function PDFViewerPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading PDF...</p>
+          <p className="text-muted-foreground">Loading Document...</p>
         </div>
       </div>
     )
@@ -118,19 +118,13 @@ export default function PDFViewerPage() {
             <div className="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
               <FileText className="w-6 h-6 text-red-600 dark:text-red-400" />
             </div>
-            <CardTitle className="text-xl text-red-600 dark:text-red-400">PDF Not Found</CardTitle>
-            <CardDescription>The requested PDF document could not be found</CardDescription>
+            <CardTitle className="text-xl text-red-600 dark:text-red-400">Document Not Found</CardTitle>
+            <CardDescription>The requested document could not be found</CardDescription>
           </CardHeader>
           <CardContent>
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
-            <Link href="/" className="block mt-4">
-              <Button variant="outline" className="w-full bg-transparent">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Go Home
-              </Button>
-            </Link>
           </CardContent>
         </Card>
       </div>
@@ -150,7 +144,6 @@ export default function PDFViewerPage() {
                 </div>
                 <div>
                   <h1 className="text-lg font-semibold">{pdfAccess.filename}</h1>
-                  <p className="text-sm text-muted-foreground">Shared by {pdfAccess.name}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -198,7 +191,6 @@ export default function PDFViewerPage() {
                 <FileText className="w-5 h-5 text-muted-foreground" />
                 <div>
                   <p className="font-medium">{pdfInfo.filename}</p>
-                  <p className="text-sm text-muted-foreground">Shared by {pdfInfo.name}</p>
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
@@ -242,15 +234,6 @@ export default function PDFViewerPage() {
               {loading ? "Verifying..." : "Access PDF"}
             </Button>
           </form>
-
-          <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
-            <Link href="/" className="block">
-              <Button variant="ghost" className="w-full">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Home
-              </Button>
-            </Link>
-          </div>
         </CardContent>
       </Card>
     </div>
