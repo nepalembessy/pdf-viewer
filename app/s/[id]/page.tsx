@@ -76,7 +76,11 @@ export default function PDFViewerPage() {
       const data = await response.json()
 
       if (response.ok) {
-        document.cookie = `pdf-access-${id}=granted; path=/; max-age=3600; secure; samesite=strict`
+        const isSecure = window.location.protocol === "https:"
+        const cookieString = `pdf-access-${id}=granted; path=/; max-age=3600; samesite=strict${isSecure ? "; secure" : ""}`
+        document.cookie = cookieString
+        console.log("[v0] Cookie set:", cookieString)
+
         setPdfAccess({
           ...data,
           pdfUrl: `/api/pdf/${id}/view`,
