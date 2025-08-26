@@ -30,6 +30,7 @@ export default function AdminDashboard() {
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalEntries, setTotalEntries] = useState(0)
+  const [copyFeedback, setCopyFeedback] = useState<string | null>(null)
   const { isLoaded, isSignedIn, user } = useUser()
   const router = useRouter()
 
@@ -92,7 +93,10 @@ export default function AdminDashboard() {
   }
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
+    navigator.clipboard.writeText(text).then(() => {
+      setCopyFeedback(text)
+      setTimeout(() => setCopyFeedback(null), 2000)
+    })
   }
 
   const totalPages = Math.ceil(totalEntries / entriesPerPage)
@@ -286,8 +290,14 @@ export default function AdminDashboard() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => copyToClipboard(`${window.location.origin}/s/${entry.id}`)}
+                                className="relative"
                               >
                                 <Link className="w-3 h-3" />
+                                {copyFeedback === `${window.location.origin}/s/${entry.id}` && (
+                                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                                    Copied!
+                                  </div>
+                                )}
                               </Button>
                             </div>
                           </TableCell>
