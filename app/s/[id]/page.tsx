@@ -10,8 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { Lock, FileText, Eye, EyeOff, Download, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { Lock, FileText, Eye, EyeOff, Download } from "lucide-react"
 
 interface PDFInfo {
   id: string
@@ -77,7 +76,11 @@ export default function PDFViewerPage() {
       const data = await response.json()
 
       if (response.ok) {
-        setPdfAccess(data)
+        document.cookie = `pdf-access-${id}=granted; path=/; max-age=3600; secure; samesite=strict`
+        setPdfAccess({
+          ...data,
+          pdfUrl: `/api/pdf/${id}/view`,
+        })
       } else {
         setError(data.error || "Access denied")
       }
@@ -90,12 +93,24 @@ export default function PDFViewerPage() {
 
   const handleDownload = () => {
     if (pdfAccess?.pdfUrl) {
-      const link = document.createElement("a")
-      link.href = pdfAccess.pdfUrl
-      link.download = pdfAccess.filename
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      fetch(`/api/pdf/${id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          const link = document.createElement("a")
+          link.href = data.pdfUrl
+          link.download = pdfAccess.filename
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        })
+        .catch(() => {
+          const link = document.createElement("a")
+          link.href = pdfAccess.pdfUrl
+          link.download = pdfAccess.filename
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        })
     }
   }
 

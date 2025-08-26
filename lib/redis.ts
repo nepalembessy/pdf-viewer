@@ -81,6 +81,10 @@ class RedisClient {
 
 export const redis = new RedisClient()
 
+export function getRedisClient() {
+  return redis
+}
+
 // Helper functions for PDF entries
 export async function savePDFEntry(entry: PDFEntry): Promise<void> {
   const key = `pdf:${entry.id}`
