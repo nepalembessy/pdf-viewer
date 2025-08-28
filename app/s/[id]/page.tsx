@@ -150,24 +150,9 @@ export default function PDFViewerPage() {
           <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
             <Lock className="w-6 h-6 text-primary" />
           </div>
-          <CardTitle>Protected PDF</CardTitle>
-          <CardDescription>Enter the password to view this document</CardDescription>
+          <CardTitle>This file is protected</CardTitle>
         </CardHeader>
         <CardContent>
-          {pdfInfo && (
-            <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-              <div className="flex items-center gap-3 mb-2">
-                <FileText className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">{pdfInfo.filename}</p>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Created on {new Date(pdfInfo.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          )}
-
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -198,9 +183,11 @@ export default function PDFViewerPage() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-
+            <a disabled={loading} href="https://in.nepalembassy.gov.np/" rel="noopener noreferrer">
+              Cancel
+            </a>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Verifying..." : "Access PDF"}
+              {loading ? "Verifying..." : "Open"}
             </Button>
           </form>
         </CardContent>
