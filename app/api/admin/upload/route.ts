@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { put } from "@vercel/blob"
 import { savePDFEntry } from "@/lib/redis"
-import { generateUniqueId } from "@/lib/utils"
+import { generateUniqueId, isValidFileType } from "@/lib/utils"
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,14 +17,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    if (file.type !== "application/pdf") {
-      return NextResponse.json({ error: "Only PDF files are allowed" }, { status: 400 })
+    if (!isValidFileType(file)) {
+      return NextResponse.json({ error: "Only Image/PDF files are allowed" }, { status: 400 })
     }
 
     // Validate file size (10MB limit)
-    const maxSize = 10 * 1024 * 1024 // 10MB
+    const maxSize = 25 * 1024 * 1024 // 10MB
     if (file.size > maxSize) {
-      return NextResponse.json({ error: "File size must be less than 10MB" }, { status: 400 })
+      return NextResponse.json({ error: "File size must be less than 20MB" }, { status: 400 })
     }
 
     // Generate unique ID for the entry
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       success: true,
       id: uniqueId,
       shareUrl: `/s/${uniqueId}`,
-      message: "PDF uploaded successfully",
+      message: "Document uploaded successfully",
     })
   } catch (error) {
     console.error("Upload error:", error)
