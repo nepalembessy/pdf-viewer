@@ -217,8 +217,8 @@ export default function AdminDashboard() {
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Add New PDF Entry</DialogTitle>
-                    <DialogDescription>Upload a PDF and create a secure sharing link</DialogDescription>
+                    <DialogTitle>Add New Entry</DialogTitle>
+                    <DialogDescription>Upload document and create a secure sharing link</DialogDescription>
                   </DialogHeader>
                   <AddEntryForm
                     onSuccess={() => {
@@ -443,7 +443,7 @@ function AddEntryForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
       <div className="space-y-2">
         <Label htmlFor="file">PDF File</Label>
-        <Input id="file" type="file" accept=".pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} required />
+        <Input id="file" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setFile(e.target.files?.[0] || null)} required />
       </div>
       {error && (
         <Alert variant="destructive">

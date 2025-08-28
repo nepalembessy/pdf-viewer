@@ -31,11 +31,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       } catch (keyError) {
         console.log("[v0] Could not list Redis keys:", keyError)
       }
-      return new NextResponse("PDF not found", { status: 404 })
+      return new NextResponse("Document not found", { status: 404 })
     }
 
-    const pdfInfo = JSON.parse(pdfData)
-    console.log("[v0] PDF info found:", { filename: pdfInfo.filename, hasUrl: !!pdfInfo.blobUrl })
+    const fileInfo = JSON.parse(pdfData)
+    console.log("[v0] PDF info found:", { filename: fileInfo.filename, hasUrl: !!fileInfo.blobUrl })
 
     // Check if user has access (via session or token)
     const sessionToken = request.cookies.get("pdf-access-" + id)?.value
@@ -51,8 +51,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Fetch the PDF from blob storage
-    console.log("[v0] Fetching PDF from blob URL:", pdfInfo.blobUrl)
-    const response = await fetch(pdfInfo.blobUrl)
+    console.log("[v0] Fetching PDF from blob URL:", fileInfo.blobUrl)
+    const response = await fetch(fileInfo.blobUrl)
     console.log("[v0] Blob fetch response status:", response.status)
 
     if (!response.ok) {
@@ -63,11 +63,21 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const pdfBuffer = await response.arrayBuffer()
     console.log("[v0] PDF fetched successfully, size:", pdfBuffer.byteLength)
 
+    let contentType = "application/octet-stream";
+    if (fileInfo.filename?.endsWith(".pdf")) {
+      contentType = "application/pdf";
+    } else if (fileInfo.filename?.endsWith(".png")) {
+      contentType = "image/png";
+    } else if (fileInfo.filename?.endsWith(".jpg") || fileInfo.filename?.endsWith(".jpeg")) {
+      contentType = "image/jpeg";
+    } // add more types as needed
+    console.log("[v0] Determined content type:", contentType)
+
     // Return PDF with proper headers
     return new NextResponse(pdfBuffer, {
       headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="${pdfInfo.filename}"`,
+        "Content-Type": contentType,
+        "Content-Disposition": `inline; filename="${fileInfo.filename}"`,
         "Cache-Control": "private, no-cache",
       },
     })

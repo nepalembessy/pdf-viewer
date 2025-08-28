@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Progress } from "@/components/ui/progress"
 import { Upload, FileText, CheckCircle, Copy } from "lucide-react"
 
 interface UploadResult {
@@ -33,8 +32,8 @@ export function PDFUploadForm() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
     if (selectedFile) {
-      if (selectedFile.type !== "application/pdf") {
-        setError("Please select a PDF file")
+      if (!selectedFile.name.match(/\.(pdf|jpeg|jpg|png)$/i)) {
+        setError("Please select a Image/PDF file")
         return
       }
       if (selectedFile.size > 10 * 1024 * 1024) {
@@ -49,7 +48,7 @@ export function PDFUploadForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!file) {
-      setError("Please select a PDF file")
+      setError("Please select a file")
       return
     }
 
@@ -116,7 +115,7 @@ export function PDFUploadForm() {
             <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
           </div>
           <CardTitle className="text-xl text-green-600 dark:text-green-400">Upload Successful!</CardTitle>
-          <CardDescription>Your PDF has been uploaded and is ready to share</CardDescription>
+          <CardDescription>Your Document has been uploaded and is ready to share</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -141,7 +140,7 @@ export function PDFUploadForm() {
             <Input value={uploadResult.id} readOnly className="font-mono text-sm" />
           </div>
           <Button onClick={resetForm} className="w-full">
-            Upload Another PDF
+            Upload Another Document
           </Button>
         </CardContent>
       </Card>
@@ -154,8 +153,8 @@ export function PDFUploadForm() {
         <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
           <Upload className="w-6 h-6 text-primary" />
         </div>
-        <CardTitle>Upload PDF</CardTitle>
-        <CardDescription>Create a secure sharing link for your PDF document</CardDescription>
+        <CardTitle>Upload Document</CardTitle>
+        <CardDescription>Create a secure sharing link for your document</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -188,13 +187,13 @@ export function PDFUploadForm() {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
-              placeholder="Password to access PDF"
+              placeholder="Password to access document"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="file">PDF File</Label>
+            <Label htmlFor="file">Document</Label>
             <div className="relative">
-              <Input id="file" type="file" accept=".pdf" onChange={handleFileChange} required />
+              <Input id="file" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleFileChange} required />
               {file && (
                 <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                   <FileText className="w-4 h-4" />
@@ -211,7 +210,6 @@ export function PDFUploadForm() {
                 <span>Uploading...</span>
                 <span>{uploadProgress}%</span>
               </div>
-              <Progress value={uploadProgress} className="w-full" />
             </div>
           )}
 
@@ -222,7 +220,7 @@ export function PDFUploadForm() {
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Uploading..." : "Upload PDF"}
+            {loading ? "Uploading..." : "Upload"}
           </Button>
         </form>
       </CardContent>
