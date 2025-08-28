@@ -7,7 +7,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     const entry = await getPDFEntry(id)
     if (!entry) {
-      return NextResponse.json({ error: "Document not found" }, { status: 404 })
+      return NextResponse.json({ error: "PDF not found" }, { status: 404 })
     }
 
     // Return entry info without sensitive data
@@ -18,8 +18,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       createdAt: entry.createdAt,
     })
   } catch (error) {
-    console.error("Error fetching Document info:", error)
-    return NextResponse.json({ error: "Failed to fetch Document info" }, { status: 500 })
+    console.error("Error fetching PDF info:", error)
+    return NextResponse.json({ error: "Failed to fetch PDF info" }, { status: 500 })
   }
 }
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
     const entry = await getPDFEntry(id)
     if (!entry) {
-      return NextResponse.json({ error: "Document not found" }, { status: 404 })
+      return NextResponse.json({ error: "PDF not found" }, { status: 404 })
     }
 
     // Verify password

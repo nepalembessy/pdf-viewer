@@ -1,101 +1,182 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import type React from "react"
+import { useState, useEffect } from "react"
+import { useParams } from "next/navigation"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ZoomIn, ZoomOut, RotateCw, Download, Maximize2 } from "lucide-react"
+import { FileText } from "lucide-react"
 
-interface PDFViewerProps {
-  pdfUrl: string
+interface PDFInfo {
+  id: string
   filename: string
+  name: string
+  createdAt: string
 }
 
-function PDFViewer({ pdfUrl, filename }: PDFViewerProps) {
-  const [zoom, setZoom] = useState(100)
-  const [rotation, setRotation] = useState(0)
-  const [isFullscreen, setIsFullscreen] = useState(false)
+interface PDFAccess {
+  success: boolean
+  pdfUrl: string
+  filename: string
+  name: string
+}
+
+export default function PDFViewerPage() {
+  const params = useParams()
+  const id = params.id as string
+
+  const [pdfInfo, setPdfInfo] = useState<PDFInfo | null>(null)
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [pdfAccess, setPdfAccess] = useState<PDFAccess | null>(null)
+  const [initialLoading, setInitialLoading] = useState(true)
 
-  const handleZoomIn = () => {
-    setZoom((prev) => Math.min(prev + 25, 200))
+  useEffect(() => {
+    fetchPDFInfo()
+  }, [id])
+
+  const fetchPDFInfo = async () => {
+    try {
+      const response = await fetch(`/api/pdf/${id}`)
+      const data = await response.json()
+
+      if (response.ok) {
+        setPdfInfo(data)
+      } else {
+        setError(data.error || "Document not found")
+      }
+    } catch (error) {
+      setError("Network error. Please try again.")
+    } finally {
+      setInitialLoading(false)
+    }
   }
 
-  const handleZoomOut = () => {
-    setZoom((prev) => Math.max(prev - 25, 50))
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
+
+    try {
+      const response = await fetch(`/api/pdf/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setPdfAccess({
+          ...data,
+          pdfUrl: data.pdfUrl, // Use the actual blob URL directly
+        })
+      } else {
+        setError(data.error || "Access denied")
+      }
+    } catch (error) {
+      setError("Network error. Please try again.")
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleRotate = () => {
-    setRotation((prev) => (prev + 90) % 360)
+  const handleDownload = () => {
+    if (pdfAccess?.pdfUrl) {
+      const link = document.createElement("a")
+      link.href = pdfAccess.pdfUrl
+      link.download = pdfAccess.filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
   }
 
-  const handleFullscreen = () => {
-    setIsFullscreen(!isFullscreen)
-  }
-
-  // Helper to check if file is image
-  const isImage = (fname: string) => {
-    return fname.match(/\.(png|jpe?g|webp|avif)$/i);
-  };
-
-  return (
-    <div className={`${isFullscreen ? "fixed inset-0 z-50 bg-white dark:bg-slate-900" : ""}`}> 
-      {/* Toolbar */}
-      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleZoomOut} disabled={zoom <= 50}>
-              <ZoomOut className="w-4 h-4" />
-            </Button>
-            <span className="text-sm font-medium min-w-[60px] text-center">{zoom}%</span>
-            <Button variant="outline" size="sm" onClick={handleZoomIn} disabled={zoom >= 200}>
-              <ZoomIn className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleRotate}>
-              <RotateCw className="w-4 h-4" />
-            </Button>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleFullscreen}>
-              <Maximize2 className="w-4 h-4" />
-            </Button>
-          </div>
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading Document...</p>
         </div>
       </div>
+    )
+  }
 
-      {error && (
-        <div className="p-4">
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </div>
-      )}
+  if (error && !pdfInfo) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+              <FileText className="w-6 h-6 text-red-600 dark:text-red-400" />
+            </div>
+            <CardTitle className="text-xl text-red-600 dark:text-red-400">Document Not Found</CardTitle>
+            <CardDescription>The requested document could not be found</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
-      {/* File Display */}
-      <div
-        className={`${isFullscreen ? "h-[calc(100vh-80px)]" : "h-[70vh]"} overflow-auto bg-slate-100 dark:bg-slate-800`}
-      >
-        <div className="flex items-center justify-center min-h-full p-4">
-          {isImage(filename) ? (
-            <img
-              src={pdfUrl}
-              alt={filename}
-              style={{ maxHeight: "100vh", width: "auto", display: "block", margin: "0 auto" }}
-              className={isFullscreen ? "w-auto h-[calc(100vh-120px)]" : "w-auto h-[600px]"}
-              onError={() => setError("Failed to load image")}
+  if (pdfAccess) {
+    return (
+      <div className="fixed inset-0 w-full h-full bg-white">
+        <iframe
+          src={`${pdfAccess.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&view=FitH`}
+          className="w-full h-full border-0"
+          title={pdfAccess.filename}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black flex items-center justify-center">
+      <div className="bg-gray-700 rounded-lg p-8 w-96 max-w-sm mx-4">
+        <h2 className="text-white text-xl font-medium mb-6 text-center">This file is protected</h2>
+
+        <form onSubmit={handlePasswordSubmit}>
+          <div className="mb-6">
+            <label className="block text-blue-400 text-sm mb-2">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-transparent border-0 border-b-2 border-blue-400 text-white placeholder-gray-400 focus:outline-none focus:border-blue-300 pb-1"
+              required
             />
-          ) : (
-            <iframe
-              src={`${pdfUrl}#zoom=${zoom}&rotate=${rotation}&toolbar=0&navpanes=0&scrollbar=1`}
-              className={`border-0 ${isFullscreen ? "w-[90vw] h-[calc(100vh-120px)]" : "w-[800px] h-[600px]"}`}
-              title={filename}
-              onError={() => setError("Failed to load PDF")}
-            />
-          )}
-        </div>
+          </div>
+
+          {error && <div className="text-red-400 text-sm mb-4 text-center">{error}</div>}
+
+          <div className="flex justify-between">
+            <button
+              type="button"
+              onClick={() => (window.location.href = "https://in.nepalembassy.gov.np/")}
+              className="text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="text-blue-400 hover:text-blue-300 transition-colors disabled:opacity-50"
+            >
+              {loading ? "Verifying..." : "Open"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   )
 }
-
-export default PDFViewer;

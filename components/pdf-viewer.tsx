@@ -29,17 +29,25 @@ export function PDFViewer({ pdfUrl, filename }: PDFViewerProps) {
     setRotation((prev) => (prev + 90) % 360)
   }
 
+  const handleDownload = () => {
+    try {
+      const link = document.createElement("a")
+      link.href = pdfUrl
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (error) {
+      setError("Failed to download PDF")
+    }
+  }
+
   const handleFullscreen = () => {
     setIsFullscreen(!isFullscreen)
   }
 
-  // Helper to check if file is image
-  const isImage = (fname: string) => {
-    return fname.match(/\.(png|jpe?g|webp|avif)$/i);
-  };
-
   return (
-    <div className={`${isFullscreen ? "fixed inset-0 z-50 bg-white dark:bg-slate-900" : ""}`}> 
+    <div className={`${isFullscreen ? "fixed inset-0 z-50 bg-white dark:bg-slate-900" : ""}`}>
       {/* Toolbar */}
       <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4">
         <div className="flex items-center justify-between">
@@ -59,6 +67,9 @@ export function PDFViewer({ pdfUrl, filename }: PDFViewerProps) {
             <Button variant="outline" size="sm" onClick={handleFullscreen}>
               <Maximize2 className="w-4 h-4" />
             </Button>
+            <Button variant="outline" size="sm" onClick={handleDownload}>
+              <Download className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </div>
@@ -71,29 +82,19 @@ export function PDFViewer({ pdfUrl, filename }: PDFViewerProps) {
         </div>
       )}
 
-      {/* File Display */}
+      {/* PDF Display */}
       <div
         className={`${isFullscreen ? "h-[calc(100vh-80px)]" : "h-[70vh]"} overflow-auto bg-slate-100 dark:bg-slate-800`}
       >
         <div className="flex items-center justify-center min-h-full p-4">
           <Card className="shadow-lg">
             <CardContent className="p-0">
-              {isImage(filename) ? (
-                <img
-                  src={pdfUrl}
-                  alt={filename}
-                  style={{ maxHeight: "100vh", width: "auto", display: "block", margin: "0 auto" }}
-                  className={isFullscreen ? "w-auto h-[calc(100vh-120px)]" : "w-auto h-[600px]"}
-                  onError={() => setError("Failed to load image")}
-                />
-              ) : (
-                <iframe
-                  src={`${pdfUrl}#zoom=${zoom}&rotate=${rotation}&toolbar=0&navpanes=0&scrollbar=1`}
-                  className={`border-0 ${isFullscreen ? "w-[90vw] h-[calc(100vh-120px)]" : "w-[800px] h-[600px]"}`}
-                  title={filename}
-                  onError={() => setError("Failed to load PDF")}
-                />
-              )}
+              <iframe
+                src={`${pdfUrl}#zoom=${zoom}&rotate=${rotation}&toolbar=0&navpanes=0&scrollbar=1`}
+                className={`border-0 ${isFullscreen ? "w-[90vw] h-[calc(100vh-120px)]" : "w-[800px] h-[600px]"}`}
+                title={filename}
+                onError={() => setError("Failed to load PDF")}
+              />
             </CardContent>
           </Card>
         </div>

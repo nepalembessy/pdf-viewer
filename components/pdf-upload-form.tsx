@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
 import { Upload, FileText, CheckCircle, Copy } from "lucide-react"
-import { isValidFileType } from "@/lib/utils"
 
 interface UploadResult {
   success: boolean
@@ -31,16 +30,15 @@ export function PDFUploadForm() {
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
 
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
     if (selectedFile) {
-      if (!isValidFileType(selectedFile)) {
-        setError("Please select a Image/PDF file")
+      if (selectedFile.type !== "application/pdf") {
+        setError("Please select a PDF file")
         return
       }
-      if (selectedFile.size > 125 * 1024 * 1024) {
-        setError("File size must be less than 20MB")
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        setError("File size must be less than 10MB")
         return
       }
       setFile(selectedFile)
@@ -51,7 +49,7 @@ export function PDFUploadForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!file) {
-      setError("Please select a Image/PDF file")
+      setError("Please select a PDF file")
       return
     }
 
@@ -143,7 +141,7 @@ export function PDFUploadForm() {
             <Input value={uploadResult.id} readOnly className="font-mono text-sm" />
           </div>
           <Button onClick={resetForm} className="w-full">
-            Upload Another Image/PDF
+            Upload Another PDF
           </Button>
         </CardContent>
       </Card>
@@ -156,8 +154,8 @@ export function PDFUploadForm() {
         <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
           <Upload className="w-6 h-6 text-primary" />
         </div>
-        <CardTitle>Upload Document</CardTitle>
-        <CardDescription>Create a secure sharing link for your document</CardDescription>
+        <CardTitle>Upload PDF</CardTitle>
+        <CardDescription>Create a secure sharing link for your PDF document</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -194,9 +192,9 @@ export function PDFUploadForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="file">Document</Label>
+            <Label htmlFor="file">PDF File</Label>
             <div className="relative">
-              <Input id="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.avif" onChange={handleFileChange} required />
+              <Input id="file" type="file" accept=".pdf" onChange={handleFileChange} required />
               {file && (
                 <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                   <FileText className="w-4 h-4" />
@@ -224,7 +222,7 @@ export function PDFUploadForm() {
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Uploading..." : "Upload Document"}
+            {loading ? "Uploading..." : "Upload PDF"}
           </Button>
         </form>
       </CardContent>
