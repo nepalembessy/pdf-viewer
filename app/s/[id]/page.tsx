@@ -8,8 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
-import { Lock, FileText, Eye, EyeOff, Download } from "lucide-react"
+import { Lock, FileText, Eye, EyeOff } from "lucide-react"
 
 interface PDFInfo {
   id: string
@@ -134,41 +133,8 @@ export default function PDFViewerPage() {
 
   if (pdfAccess) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-        {/* Header */}
-        <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-lg font-semibold">{pdfAccess.filename}</h1>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-xs">
-                  <Lock className="w-3 h-3 mr-1" />
-                  Protected
-                </Badge>
-                <Button variant="outline" size="sm" onClick={handleDownload}>
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* PDF Viewer */}
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden">
-            <div className="w-full h-[calc(100vh-200px)]">
-              <iframe src={pdfAccess.pdfUrl} className="w-full h-full border-0" title={pdfAccess.filename} />
-            </div>
-          </div>
-        </div>
+      <div className="fixed inset-0 w-full h-full bg-white">
+        <iframe src={pdfAccess.pdfUrl} className="w-full h-full border-0" title={pdfAccess.filename} />
       </div>
     )
   }
