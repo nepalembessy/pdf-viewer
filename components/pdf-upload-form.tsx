@@ -194,7 +194,7 @@ export function PDFUploadForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="file">PDF File</Label>
+            <Label htmlFor="file">Document</Label>
             <div className="relative">
               <Input id="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.avif" onChange={handleFileChange} required />
               {file && (

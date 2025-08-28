@@ -375,7 +375,7 @@ function AddEntryForm({ onSuccess }: { onSuccess: () => void }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!file) {
-      setError("Please select a PDF file")
+      setError("Please select Image/PDF file")
       return
     }
 
@@ -442,8 +442,8 @@ function AddEntryForm({ onSuccess }: { onSuccess: () => void }) {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="file">PDF File</Label>
-        <Input id="file" type="file" accept=".pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} required />
+        <Label htmlFor="file">Document</Label>
+        <Input id="file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.avif" onChange={(e) => setFile(e.target.files?.[0] || null)} required />
       </div>
       {error && (
         <Alert variant="destructive">
