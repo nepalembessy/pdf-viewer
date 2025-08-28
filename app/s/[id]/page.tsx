@@ -3,12 +3,9 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Lock, FileText, Eye, EyeOff } from "lucide-react"
+import { FileText } from "lucide-react"
 
 interface PDFInfo {
   id: string
@@ -144,54 +141,42 @@ export default function PDFViewerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-            <Lock className="w-6 h-6 text-primary" />
-          </div>
-          <CardTitle>This file is protected</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handlePasswordSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="Enter access password"
-                  className="pr-10"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
+    <div className="fixed inset-0 bg-black flex items-center justify-center">
+      <div className="bg-gray-700 rounded-lg p-8 w-96 max-w-sm mx-4">
+        <h2 className="text-white text-xl font-medium mb-6 text-center">This file is protected</h2>
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <a disabled={loading} href="https://in.nepalembassy.gov.np/" rel="noopener noreferrer">
+        <form onSubmit={handlePasswordSubmit}>
+          <div className="mb-6">
+            <label className="block text-blue-400 text-sm mb-2">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-transparent border-0 border-b-2 border-blue-400 text-white placeholder-gray-400 focus:outline-none focus:border-blue-300 pb-1"
+              required
+            />
+          </div>
+
+          {error && <div className="text-red-400 text-sm mb-4 text-center">{error}</div>}
+
+          <div className="flex justify-between">
+            <button
+              type="button"
+              onClick={() => (window.location.href = "https://in.nepalembassy.gov.np/")}
+              className="text-blue-400 hover:text-blue-300 transition-colors"
+            >
               Cancel
-            </a>
-            <Button type="submit" className="w-full" disabled={loading}>
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="text-blue-400 hover:text-blue-300 transition-colors disabled:opacity-50"
+            >
               {loading ? "Verifying..." : "Open"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }
