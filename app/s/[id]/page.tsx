@@ -134,7 +134,11 @@ export default function PDFViewerPage() {
   if (pdfAccess) {
     return (
       <div className="fixed inset-0 w-full h-full bg-white">
-        <iframe src={pdfAccess.pdfUrl} className="w-full h-full border-0" title={pdfAccess.filename} />
+        <iframe
+          src={`${pdfAccess.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&view=FitH`}
+          className="w-full h-full border-0"
+          title={pdfAccess.filename}
+        />
       </div>
     )
   }
