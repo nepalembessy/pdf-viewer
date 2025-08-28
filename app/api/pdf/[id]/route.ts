@@ -3,7 +3,7 @@ import { getPDFEntry } from "@/lib/redis"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { id } = params
+    const { id } = await params
 
     const entry = await getPDFEntry(id)
     if (!entry) {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { id } = params
+    const { id } = await params
     const { password } = await request.json()
 
     if (!password) {

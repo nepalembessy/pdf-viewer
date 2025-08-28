@@ -85,16 +85,6 @@ export default function PDFViewerPage() {
     }
   }
 
-  const handleDownload = () => {
-    if (pdfAccess?.pdfUrl) {
-      const link = document.createElement("a")
-      link.href = pdfAccess.pdfUrl
-      link.download = pdfAccess.filename
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    }
-  }
 
   if (initialLoading) {
     return (
@@ -129,13 +119,19 @@ export default function PDFViewerPage() {
   }
 
   if (pdfAccess) {
+    const { filename } = pdfInfo || {};
+    const isImage = filename?.match(/\.(jpeg|jpg|png|gif|bmp|webp|tiff)$/i);
     return (
       <div className="fixed inset-0 w-full h-full bg-white">
+        {isImage ? (
+          <img src={pdfAccess.pdfUrl} alt={pdfAccess.name} className="w-full h-full object-contain" />
+        ) : (
         <iframe
           src={`${pdfAccess.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&view=FitH`}
           className="w-full h-full border-0"
           title={pdfAccess.filename}
         />
+        )}
       </div>
     )
   }
