@@ -1,48 +1,66 @@
-"use client"
+// components/PdfViewer.tsx
+'use client';
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useState, useEffect, useRef } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
 
-interface PDFViewerProps {
-  pdfUrl: string
-  filename: string
+
+// pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+//   'pdfjs-dist/build/pdf.worker.min.mjs',
+//   import.meta.url,
+// ).toString();
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+interface Props {
+  pdfUrl: string;
 }
 
-export function PDFViewer({ pdfUrl, filename }: PDFViewerProps) {
-  const [zoom, setZoom] = useState(100)
-  const [rotation, setRotation] = useState(0)
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [error, setError] = useState("")
+export default function PdfViewer({ pdfUrl }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pageWidth, setPageWidth] = useState<number | null>(null);
 
+  useEffect(() => {
+    function updatePageWidth() {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth;
+        setPageWidth(width);
+      }
+    }
+
+    updatePageWidth();
+    window.addEventListener('resize', updatePageWidth);
+    return () => window.removeEventListener('resize', updatePageWidth);
+  }, []);
 
   return (
-    <div className={`${isFullscreen ? "fixed inset-0 z-50 bg-white dark:bg-slate-900" : ""}`}>
-      {error && (
-        <div className="p-4">
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </div>
-      )}
-
-      {/* PDF Display */}
-      <div
-        className={`${isFullscreen ? "h-[calc(100vh-80px)]" : "h-[70vh]"} overflow-auto bg-slate-100 dark:bg-slate-800`}
+    <div
+      ref={containerRef}
+      style={{
+        width: '90%',
+        minHeight: '100vh',
+        overflowX: 'hidden',
+        overflowY: 'auto',
+        backgroundColor: 'white',
+        padding: '1rem',
+        boxSizing: 'border-box',
+      }}
+    >
+      <Document
+        file={pdfUrl}
+        loading={<p>Loading PDF...</p>}
+        error={<p>Failed to load PDF.</p>}
+        noData={<p>No PDF file specified.</p>}
       >
-        <div className="flex items-center justify-center min-h-full p-4">
-          <Card className="shadow-lg">
-            <CardContent className="p-0">
-              <iframe
-                src={`${pdfUrl}#zoom=${zoom}&rotate=${rotation}&toolbar=0&navpanes=0&scrollbar=1`}
-                className={`border-0 ${isFullscreen ? "w-[90vw] h-[calc(100vh-120px)]" : "w-[800px] h-[600px]"}`}
-                title={filename}
-                onError={() => setError("Failed to load PDF")}
-              />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+        {pageWidth && (
+          <Page
+            pageNumber={1}
+            width={pageWidth}
+            renderAnnotationLayer={false}
+            renderTextLayer={false}
+          />
+        )}
+      </Document>
     </div>
-  )
+  );
 }

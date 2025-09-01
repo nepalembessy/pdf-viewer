@@ -3,9 +3,14 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
+import dynamic from "next/dynamic"
+import { FileText } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { FileText } from "lucide-react"
+
+const PdfViewer = dynamic(() => import('@/components/pdf-viewer'), {
+  ssr: false,
+});
 
 interface PDFInfo {
   id: string
@@ -126,11 +131,11 @@ export default function PDFViewerPage() {
         {isImage ? (
           <img src={pdfAccess.pdfUrl} alt={pdfAccess.name} className="w-full h-full object-contain" />
         ) : (
-        <iframe
-          src={`${pdfAccess.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&view=FitH`}
-          className="w-full h-full border-0"
-          title={pdfAccess.filename}
-        />
+          <div className="fixed inset-0 bg-white">
+            <PdfViewer
+              pdfUrl={pdfAccess.pdfUrl}
+            />
+          </div>
         )}
       </div>
     )
