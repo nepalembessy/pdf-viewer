@@ -137,7 +137,7 @@ export default function PDFViewerPage() {
         {isImage ? (
           <img src={pdfAccess.pdfUrl} alt={pdfAccess.name} className="w-full min-h-screen object-contain" />
         ) : (
-          <div className="inset-0 w-full min-h-screen">
+          <div className="inset-0 w-full">
             <PdfViewer
               pdfUrl={pdfAccess.pdfUrl}
             />

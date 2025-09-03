@@ -17,21 +17,7 @@ interface Props {
 }
 
 export default function PdfViewer({ pdfUrl }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [pageWidth, setPageWidth] = useState<number | null>(null);
-
-  useEffect(() => {
-    function updatePageWidth() {
-      if (containerRef.current) {
-        const width = containerRef.current.offsetWidth;
-        setPageWidth(width);
-      }
-    }
-
-    updatePageWidth();
-    window.addEventListener('resize', updatePageWidth);
-    return () => window.removeEventListener('resize', updatePageWidth);
-  }, []);
+  const containerRef = useRef<HTMLDivElement>(null);  
 
   return (
     <div
@@ -46,15 +32,12 @@ export default function PdfViewer({ pdfUrl }: Props) {
         error={<p>Failed to load Document.</p>}
         noData={<p>Document not found.</p>}
       >
-        {pageWidth && (
-          <Page
-            pageNumber={1}
-            width={pageWidth}
-            renderAnnotationLayer={false}
-            renderTextLayer={false}
-            canvasBackground='transparent'
-          />
-        )}
+        <Page
+          pageNumber={1}
+          renderAnnotationLayer={false}
+          renderTextLayer={false}
+          canvasBackground='transparent'
+        />
       </Document>
     </div>
   );
