@@ -133,11 +133,11 @@ export default function PDFViewerPage() {
     const { filename } = pdfInfo || {};
     const isImage = filename?.match(/\.(jpeg|jpg|png|gif|bmp|webp|tiff)$/i);
     return (
-      <div className="bg-[#262626] inset-0 w-full h-full">
+      <div className="bg-[#262626] min-h-screen inset-0 w-full">
         {isImage ? (
-          <img src={pdfAccess.pdfUrl} alt={pdfAccess.name} className="w-full h-full object-contain" />
+          <img src={pdfAccess.pdfUrl} alt={pdfAccess.name} className="w-full min-h-screen object-contain" />
         ) : (
-          <div className="inset-0 w-full h-full">
+          <div className="inset-0 w-full min-h-screen">
             <PdfViewer
               pdfUrl={pdfAccess.pdfUrl}
             />
