@@ -37,20 +37,14 @@ export default function PdfViewer({ pdfUrl }: Props) {
     <div
       ref={containerRef}
       style={{
-        width: '90%',
-        minHeight: '100vh',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-        backgroundColor: 'white',
-        padding: '1rem',
         boxSizing: 'border-box',
       }}
     >
       <Document
         file={pdfUrl}
-        loading={<p>Loading PDF...</p>}
-        error={<p>Failed to load PDF.</p>}
-        noData={<p>No PDF file specified.</p>}
+        loading={<p className="text-center">Loading Document...</p>}
+        error={<p>Failed to load Document.</p>}
+        noData={<p>Document not found.</p>}
       >
         {pageWidth && (
           <Page
@@ -58,6 +52,7 @@ export default function PdfViewer({ pdfUrl }: Props) {
             width={pageWidth}
             renderAnnotationLayer={false}
             renderTextLayer={false}
+            canvasBackground='transparent'
           />
         )}
       </Document>

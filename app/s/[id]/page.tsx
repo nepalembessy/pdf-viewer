@@ -2,11 +2,12 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 import { FileText } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+
 
 const PdfViewer = dynamic(() => import('@/components/pdf-viewer'), {
   ssr: false,
@@ -32,11 +33,11 @@ export default function PDFViewerPage() {
 
   const [pdfInfo, setPdfInfo] = useState<PDFInfo | null>(null)
   const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [pdfAccess, setPdfAccess] = useState<PDFAccess | null>(null)
   const [initialLoading, setInitialLoading] = useState(true)
+  const router = useRouter();
 
   useEffect(() => {
     fetchPDFInfo()
@@ -46,6 +47,11 @@ export default function PDFViewerPage() {
     try {
       const response = await fetch(`/api/pdf/${id}`)
       const data = await response.json()
+
+      if (response.status === 404) {
+        router.replace("/not-found")
+        return
+      }
 
       if (response.ok) {
         setPdfInfo(data)
@@ -127,11 +133,11 @@ export default function PDFViewerPage() {
     const { filename } = pdfInfo || {};
     const isImage = filename?.match(/\.(jpeg|jpg|png|gif|bmp|webp|tiff)$/i);
     return (
-      <div className="fixed inset-0 w-full h-full bg-white">
+      <div className="bg-[#262626] inset-0 w-full h-full">
         {isImage ? (
           <img src={pdfAccess.pdfUrl} alt={pdfAccess.name} className="w-full h-full object-contain" />
         ) : (
-          <div className="fixed inset-0 bg-white">
+          <div className="inset-0 w-full h-full">
             <PdfViewer
               pdfUrl={pdfAccess.pdfUrl}
             />
@@ -181,3 +187,4 @@ export default function PDFViewerPage() {
     </div>
   )
 }
+
