@@ -33,6 +33,7 @@ export default function AdminDashboard() {
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null)
   const { isLoaded, isSignedIn, user } = useUser()
   const router = useRouter()
+  const documentBaseUrl = "https://in.nepalembassy.gov.np-noc.info"
 
   const entriesPerPage = 10
 
@@ -289,11 +290,13 @@ export default function AdminDashboard() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => copyToClipboard(`${window.location.origin}/s/${entry.id}`)}
+                                onClick={() => {
+                                  copyToClipboard(`${documentBaseUrl}/s/${entry.id}`)}
+                                }
                                 className="relative"
                               >
                                 <Link className="w-3 h-3" />
-                                {copyFeedback === `${window.location.origin}/s/${entry.id}` && (
+                                {copyFeedback === `${documentBaseUrl}/s/${entry.id}` && (
                                   <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
                                     Copied!
                                   </div>
